@@ -19,12 +19,12 @@ atualizar_progresso() {
 
 # update
 echo "Atualizando pacotes..."
-sudo apt-get update &>/dev/null && sudo apt-get upgrade -y &>/dev/null
+sudo apt-get update && sudo apt-get upgrade -y
 atualizar_progresso
 
 # Essentials
 echo "Instalando pacotes essenciais..."
-sudo apt install -y git curl zsh wget build-essential netdiscover macchanger wifite &>/dev/null
+sudo apt install -y git curl zsh wget build-essential netdiscover macchanger wifite
 atualizar_progresso
 
 # GNOME Dash-to-Dock
@@ -60,7 +60,6 @@ fi
 atualizar_progresso
 
 # Play a sound in every restart o init system 
-
 USER_HOME="/home/$(logname)"
 USER_ID=$(id -u "$SUDO_USER")
 USER_ENV="XDG_RUNTIME_DIR=/run/user/$USER_ID DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$USER_ID/bus"
@@ -102,6 +101,8 @@ sudo -u "$SUDO_USER" env $USER_ENV systemctl --user enable play_audio.service
 sudo -u "$SUDO_USER" env $USER_ENV systemctl --user start play_audio.service
 
 echo "Reiniciando..."
+
 sleep "5"
+
 # restart gnome
 sudo -u "$SUDO_USER" killall -SIGUSR1 gnome-shell
