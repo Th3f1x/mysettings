@@ -14,7 +14,9 @@ atualizar_progresso() {
     PROGRESSO=$((PROGRESSO + 1))
     PERCENTUAL=$((PROGRESSO * 100 / TOTAL_PASSOS))
     echo -ne "Progresso: [$PROGRESSO/$TOTAL_PASSOS] $PERCENTUAL% \r"
-    sleep 0.5
+    echo "
+    "
+    sleep 1
 }
 
 # update
@@ -24,20 +26,27 @@ atualizar_progresso
 
 # Essentials
 echo "Instalando pacotes essenciais..."
-sudo apt install -y git curl zsh wget build-essential netdiscover macchanger wifite
+sudo apt install -y git curl zsh wget build-essential netdiscover macchanger wifite openssh-server pulseaudio
+sudo -u "$SUDO_USER" systemctl start ssh
+sudo -u "$SUDO_USER" systemctl enable ssh
+
 atualizar_progresso
 
 # GNOME Dash-to-Dock
-echo "Configurando o GNOME Dash-to-Dock..."
-export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u $SUDO_USER)/bus"
-sudo -u "$SUDO_USER" gsettings set org.gnome.shell.extensions.dash-to-dock dock-position BOTTOM &>/dev/null
-sudo -u "$SUDO_USER" gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false &>/dev/null
-sudo -u "$SUDO_USER" gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode FIXED &>/dev/null
-sudo -u "$SUDO_USER" gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 36 &>/dev/null
-sudo -u "$SUDO_USER" gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity 0 &>/dev/null
+echo -e "\e[33mgsettings set org.gnome.shell.extensions.dash-to-dock dock-position BOTTOM\e[0m"
+echo -e "\e[33mgsettings set org.gnome.shell.extensions.dash-to-dock extend-height false\e[0m"
+echo -e "\e[33mgsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode FIXED\e[0m"
+echo -e "\e[33mgsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 36\e[0m"
+echo -e "\e[33mgsettings set org.gnome.shell.extensions.dash-to-dock background-opacity 0\e[0m"
+echo "
+"
+echo -e "\e[31mDigite os comandos acima em um terminal separado, após  isso  pressione *ENTER* para continuar a instalação:\e[0m"
+read
 atualizar_progresso
 
 # ZSH theme
+echo "
+"
 echo "Aplicando tema Zsh..."
 sudo -u "$SUDO_USER" git clone https://github.com/egorlem/ultima.zsh-theme /home/$SUDO_USER/ultima-shell &>/dev/null
 echo 'source ~/ultima-shell/ultima.zsh-theme' | sudo -u "$SUDO_USER" tee -a /home/$SUDO_USER/.zshrc &>/dev/null
@@ -46,6 +55,7 @@ atualizar_progresso
 
 # wallpaper change
 echo "Alterando wallpaper..."
+export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u $SUDO_USER)/bus"
 WALLPAPER_PATH="/home/$SUDO_USER/mysettings/wallpaper.jpg"
 if [ -f "$WALLPAPER_PATH" ]; then
     sudo -u "$SUDO_USER" DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS \
@@ -55,8 +65,9 @@ if [ -f "$WALLPAPER_PATH" ]; then
 
 else
     echo "Erro: Arquivo de wallpaper não encontrado."
-    exit 1
-fi
+    echo "Ignorando e continuando..."
+    sleep "5"
+
 atualizar_progresso
 
 # Play a sound in every restart o init system 
@@ -106,3 +117,4 @@ sleep "5"
 
 # restart gnome
 sudo -u "$SUDO_USER" killall -SIGUSR1 gnome-shell
+fi
